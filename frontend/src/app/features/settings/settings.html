@@ -1,0 +1,190 @@
+<div class="settings-container">
+  <header class="page-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/dashboard">← Back to Dashboard</button>
+      <h1>⚙️ Settings</h1>
+      <p>Customize your learning experience</p>
+    </div>
+  </header>
+
+  <div class="content">
+    <div class="settings-layout">
+      <!-- Profile Settings -->
+      <div class="settings-section">
+        <h2>👤 Profile Settings</h2>
+        <div class="settings-card">
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" [(ngModel)]="profile.name" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" [(ngModel)]="profile.email" />
+          </div>
+          <div class="form-group">
+            <label>Class/Grade</label>
+            <input type="text" [(ngModel)]="profile.class" />
+          </div>
+          <div class="form-group">
+            <label>Bio</label>
+            <textarea [(ngModel)]="profile.bio" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notification Settings -->
+      <div class="settings-section">
+        <h2>🔔 Notifications</h2>
+        <div class="settings-card">
+          <div class="toggle-group">
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <strong>Email Notifications</strong>
+                <span>Receive updates via email</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="notifications.emailNotifications" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <strong>Push Notifications</strong>
+                <span>Get browser notifications</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="notifications.pushNotifications" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <strong>Discussion Updates</strong>
+                <span>Notify about new messages</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="notifications.discussionUpdates" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <strong>Progress Reminders</strong>
+                <span>Daily learning reminders</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="notifications.progressReminders" />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="toggle-item">
+              <div class="toggle-info">
+                <strong>Weekly Report</strong>
+                <span>Get weekly progress summary</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" [(ngModel)]="notifications.weeklyReport" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Learning Preferences -->
+      <div class="settings-section">
+        <h2>🎓 Learning Preferences</h2>
+        <div class="settings-card">
+          <div class="form-group">
+            <label>Playback Speed</label>
+            <select [(ngModel)]="preferences.playbackSpeed">
+              <option value="0.5">0.5x</option>
+              <option value="0.75">0.75x</option>
+              <option value="1.0">1.0x (Normal)</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="2.0">2.0x</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Theme</label>
+            <select [(ngModel)]="preferences.theme">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="auto">Auto</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Language</label>
+            <select [(ngModel)]="preferences.language">
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="fr">French</option>
+              <option value="de">German</option>
+            </select>
+          </div>
+
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <strong>Autoplay Next Topic</strong>
+              <span>Automatically play next audio</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="preferences.autoplay" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Privacy Settings -->
+      <div class="settings-section">
+        <h2>🔒 Privacy</h2>
+        <div class="settings-card">
+          <div class="form-group">
+            <label>Profile Visibility</label>
+            <select [(ngModel)]="privacy.profileVisibility">
+              <option value="public">Public</option>
+              <option value="friends">Friends Only</option>
+              <option value="private">Private</option>
+            </select>
+          </div>
+
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <strong>Show Progress</strong>
+              <span>Display progress on profile</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="privacy.showProgress" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-item">
+            <div class="toggle-info">
+              <strong>Allow Messages</strong>
+              <span>Let others send you messages</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="privacy.allowMessages" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="settings-actions">
+        <button class="btn-save" (click)="saveSettings()">💾 Save Changes</button>
+        <button class="btn-reset" (click)="resetSettings()">🔄 Reset to Default</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,70 @@
+<div class="discussions-container">
+  <header class="page-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/dashboard">← Back to Dashboard</button>
+      <h1>💬 Discussions</h1>
+      <p>Engage with fellow learners</p>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- Discussion List View -->
+    <div *ngIf="!selectedDiscussion" class="discussions-list">
+      <div class="list-header">
+        <h2>Active Discussions</h2>
+        <button class="btn-new">+ New Discussion</button>
+      </div>
+
+      <div class="discussion-cards">
+        <div *ngFor="let discussion of discussions" 
+             class="discussion-card"
+             (click)="selectDiscussion(discussion)">
+          <div class="discussion-header">
+            <h3>{{ discussion.title }}</h3>
+            <span class="topic-badge">{{ discussion.topic }}</span>
+          </div>
+          <div class="discussion-meta">
+            <span class="meta-item">💬 {{ discussion.messageCount }} messages</span>
+            <span class="meta-item">👥 {{ discussion.participants }} participants</span>
+            <span class="meta-item">🕐 {{ getTimeAgo(discussion.lastActivity) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat View -->
+    <div *ngIf="selectedDiscussion" class="chat-view">
+      <div class="chat-header">
+        <button class="btn-back-chat" (click)="backToList()">← Back</button>
+        <div class="chat-title">
+          <h2>{{ selectedDiscussion.title }}</h2>
+          <span class="chat-meta">{{ selectedDiscussion.participants }} participants</span>
+        </div>
+      </div>
+
+      <div class="messages-container">
+        <div *ngFor="let message of messages" 
+             class="message"
+             [class.own-message]="message.isOwn">
+          <div class="message-bubble">
+            <div class="message-header">
+              <strong>{{ message.user }}</strong>
+              <span class="message-time">{{ getTimeAgo(message.timestamp) }}</span>
+            </div>
+            <p>{{ message.text }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="message-input">
+        <input 
+          type="text" 
+          [(ngModel)]="newMessage"
+          (keyup.enter)="sendMessage()"
+          placeholder="Type your message..."
+        />
+        <button class="btn-send" (click)="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,128 @@
+<div class="ai-chat-container">
+  <header class="page-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/dashboard">← Back to Dashboard</button>
+      <div class="header-title">
+        <h1>🤖 AI Voice Chat</h1>
+        <p>Talk to your AI learning assistant powered by Gemini</p>
+      </div>
+      <div class="connection-status" [class.connected]="isConnected">
+        <span class="status-dot"></span>
+        <span class="status-text">{{ isConnected ? 'Connected' : 'Disconnected' }}</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- Greeting Message -->
+    <div *ngIf="greetingMessage" class="greeting-card">
+      <div class="greeting-icon">👋</div>
+      <p>{{ greetingMessage }}</p>
+    </div>
+
+    <!-- Main Chat Interface -->
+    <div class="chat-interface">
+      <!-- Text Input Section -->
+      <div class="section-card text-section">
+        <div class="section-header">
+          <i class="icon">⌨️</i>
+          <h2>Text to Audio</h2>
+          <p>Type your message and get an audio response</p>
+        </div>
+        
+        <form (ngSubmit)="sendTextMessage()" class="text-form">
+          <input
+            type="text"
+            [(ngModel)]="textInput"
+            name="textInput"
+            placeholder="Type your question here..."
+            [disabled]="!isConnected"
+            class="text-input"
+          />
+          <button 
+            type="submit" 
+            class="btn-send"
+            [disabled]="!isConnected || textInput.trim() === ''"
+          >
+            <span class="btn-icon">📤</span>
+            <span>Generate Audio</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Voice Recording Section -->
+      <div class="section-card voice-section">
+        <div class="section-header">
+          <i class="icon">🎤</i>
+          <h2>Voice Conversation</h2>
+          <p>Speak to the AI and hear its response in real-time</p>
+        </div>
+
+        <div class="voice-controls">
+          <button 
+            (click)="toggleRecording()"
+            class="btn-record"
+            [class.recording]="isRecording"
+            [class.pulse]="isRecording"
+            [disabled]="!isConnected"
+          >
+            <span class="record-icon" *ngIf="!isRecording">🎤</span>
+            <span class="record-icon stop" *ngIf="isRecording">⏹️</span>
+            <span class="record-text">
+              {{ isRecording ? 'Stop Recording' : 'Start Voice Chat' }}
+            </span>
+          </button>
+
+          <div *ngIf="isRecording" class="recording-indicator">
+            <div class="wave-animation">
+              <div class="wave"></div>
+              <div class="wave"></div>
+              <div class="wave"></div>
+            </div>
+            <p>Listening... Speak now</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instructions Card -->
+      <div class="instructions-card">
+        <h3>💡 How to Use</h3>
+        <ul>
+          <li>
+            <strong>Text Mode:</strong> Type your question and click "Generate Audio" to hear the AI's response
+          </li>
+          <li>
+            <strong>Voice Mode:</strong> Click "Start Voice Chat" and speak your question. The AI will respond with audio
+          </li>
+          <li>
+            <strong>Tip:</strong> Make sure your microphone is enabled and you're in a quiet environment for best results
+          </li>
+        </ul>
+      </div>
+
+      <!-- Features Grid -->
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h4>Personalized Learning</h4>
+          <p>AI adapts to your learning style and pace</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🗣️</div>
+          <h4>Natural Conversation</h4>
+          <p>Talk naturally like with a real teacher</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h4>Real-time Response</h4>
+          <p>Get instant audio feedback on your questions</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📚</div>
+          <h4>Multi-topic Support</h4>
+          <p>Ask about any subject you're learning</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

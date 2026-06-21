@@ -1,0 +1,53 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1>Welcome, {{ user.name }}!</h1>
+    <button class="btn-logout" (click)="logout()">Logout</button>
+  </header>
+
+  <div class="dashboard-content">
+    <div class="welcome-section">
+      <h2>Audio Learning Platform Dashboard</h2>
+      <p>Your personalized learning experience starts here.</p>
+    </div>
+
+    <div class="quick-links">
+      <a routerLink="/ai-chat" class="link-card featured">
+        <div class="icon">🤖</div>
+        <h3>AI Voice Chat</h3>
+        <p>Talk to your AI learning assistant</p>
+        <span class="badge">NEW</span>
+      </a>
+
+      <a routerLink="/audio-learning" class="link-card">
+        <div class="icon">🎧</div>
+        <h3>Audio Learning</h3>
+        <p>Start learning with audio content</p>
+      </a>
+
+      <a routerLink="/discussions" class="link-card">
+        <div class="icon">💬</div>
+        <h3>Discussions</h3>
+        <p>Engage in conversations</p>
+      </a>
+
+      <a routerLink="/progress" class="link-card">
+        <div class="icon">📊</div>
+        <h3>Progress</h3>
+        <p>Track your learning journey</p>
+      </a>
+
+      <a routerLink="/settings" class="link-card">
+        <div class="icon">⚙️</div>
+        <h3>Settings</h3>
+        <p>Customize your experience</p>
+      </a>
+    </div>
+
+    <div class="user-info">
+      <h3>Your Profile</h3>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p><strong>Class:</strong> {{ user.class }}</p>
+      <p><strong>Setup Complete:</strong> {{ user.setupComplete ? 'Yes' : 'No' }}</p>
+    </div>
+  </div>
+</div>
