@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - AI Learning Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    .settings-nav {
+      display: flex;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+      border-bottom: 2px solid var(--border-color);
+      overflow-x: auto;
+    }
+
+    .settings-tab {
+      padding: var(--spacing-md) var(--spacing-lg);
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .settings-tab:hover {
+      color: var(--text-primary);
+    }
+
+    .settings-tab.active {
+      color: var(--primary-color);
+      border-bottom-color: var(--primary-color);
+    }
+
+    .settings-section {
+      display: none;
+    }
+
+    .settings-section.active {
+      display: block;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-lg) 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-info h4 {
+      font-weight: 600;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .setting-info p {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      margin: 0;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+      background-color: var(--border-color);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: background-color var(--transition-fast);
+    }
+
+    .toggle-switch.active {
+      background-color: var(--primary-color);
+    }
+
+    .toggle-slider {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      background-color: white;
+      border-radius: 50%;
+      transition: transform var(--transition-fast);
+    }
+
+    .toggle-switch.active .toggle-slider {
+      transform: translateX(24px);
+    }
+
+    .personality-option {
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .personality-option:hover {
+      border-color: var(--primary-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .personality-option.selected {
+      border-color: var(--primary-color);
+      background-color: rgba(98, 0, 238, 0.05);
+    }
+
+    .personality-option input[type="radio"] {
+      display: none;
+    }
+
+    .personality-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .personality-icon-box {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .personality-name {
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
+
+    .personality-description {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .danger-zone {
+      border: 2px solid var(--error);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      margin-top: var(--spacing-xl);
+    }
+
+    .danger-zone h3 {
+      color: var(--error);
+      margin-bottom: var(--spacing-md);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="main-content">
+      <div class="content">
+        <div class="page-header">
+          <h1 class="page-title">Settings</h1>
+          <p class="page-subtitle">Manage your account and preferences</p>
+        </div>
+
+        <!-- Settings Navigation -->
+        <div class="settings-nav">
+          <div class="settings-tab active" data-tab="learning">
+            <i class="fas fa-brain"></i> Learning
+          </div>
+          <div class="settings-tab" data-tab="notifications">
+            <i class="fas fa-bell"></i> Notifications
+          </div>
+          <div class="settings-tab" data-tab="security">
+            <i class="fas fa-lock"></i> Security
+          </div>
+          <div class="settings-tab" data-tab="account">
+            <i class="fas fa-user-cog"></i> Account
+          </div>
+        </div>
+
+        <!-- Learning Settings -->
+        <div class="settings-section active" data-section="learning">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">AI Teacher Personality</h3>
+            </div>
+            <div class="card-body">
+              <div id="personality-options">
+                <!-- Personalities will be rendered here -->
+              </div>
+              <button class="btn btn-primary" id="save-personality">
+                <i class="fas fa-save"></i>
+                Save Personality
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Learning Preferences</h3>
+            </div>
+            <div class="card-body">
+              <form id="learning-preferences-form">
+                <div class="form-group">
+                  <label for="learning-pace" class="form-label">Learning Pace</label>
+                  <select id="learning-pace" class="form-select">
+                    <option value="slow">Slow & Steady</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="fast">Fast & Intensive</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="difficulty-level" class="form-label">Difficulty Level</label>
+                  <select id="difficulty-level" class="form-select">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="daily-goal" class="form-label">Daily Learning Goal (minutes)</label>
+                  <select id="daily-goal" class="form-select">
+                    <option value="15">15 minutes</option>
+                    <option value="30">30 minutes</option>
+                    <option value="45">45 minutes</option>
+                    <option value="60">60 minutes</option>
+                  </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i>
+                  Save Preferences
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="settings-section" data-section="notifications">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Notification Preferences</h3>
+            </div>
+            <div class="card-body">
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h4>Email Notifications</h4>
+                  <p>Receive updates and reminders via email</p>
+                </div>
+                <div class="toggle-switch" data-setting="emailNotifications">
+                  <div class="toggle-slider"></div>
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h4>Quiz Reminders</h4>
+                  <p>Get notified about upcoming quizzes</p>
+                </div>
+                <div class="toggle-switch" data-setting="quizReminders">
+                  <div class="toggle-slider"></div>
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h4>Discussion Replies</h4>
+                  <p>Notify when someone replies to your discussions</p>
+                </div>
+                <div class="toggle-switch active" data-setting="discussionReplies">
+                  <div class="toggle-slider"></div>
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h4>Daily Summary</h4>
+                  <p>Receive a daily summary of your progress</p>
+                </div>
+                <div class="toggle-switch" data-setting="dailySummary">
+                  <div class="toggle-slider"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Security Settings -->
+        <div class="settings-section" data-section="security">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Change Password</h3>
+            </div>
+            <div class="card-body">
+              <form id="change-password-form">
+                <div class="form-group">
+                  <label for="current-password" class="form-label required">Current Password</label>
+                  <input 
+                    type="password" 
+                    id="current-password" 
+                    class="form-input" 
+                    required
+                  >
+                </div>
+
+                <div class="form-group">
+                  <label for="new-password" class="form-label required">New Password</label>
+                  <input 
+                    type="password" 
+                    id="new-password" 
+                    class="form-input" 
+                    required
+                  >
+                  <p class="form-help">Password must be at least 6 characters long</p>
+                </div>
+
+                <div class="form-group">
+                  <label for="confirm-password" class="form-label required">Confirm New Password</label>
+                  <input 
+                    type="password" 
+                    id="confirm-password" 
+                    class="form-input" 
+                    required
+                  >
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-key"></i>
+                  Update Password
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Settings -->
+        <div class="settings-section" data-section="account">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Account Information</h3>
+            </div>
+            <div class="card-body">
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h4>Account Status</h4>
+                  <p>Your account is active</p>
+                </div>
+                <span class="badge badge-success">Active</span>
+              </div>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h4>Member Since</h4>
+                  <p id="member-since">-</p>
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h4>Setup Completed</h4>
+                  <p>Your initial setup is complete</p>
+                </div>
+                <span class="badge badge-success">
+                  <i class="fas fa-check"></i> Complete
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="danger-zone">
+            <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+            <p class="text-secondary mb-md">These actions are irreversible. Please be careful.</p>
+            <button class="btn btn-danger" id="delete-account-btn">
+              <i class="fas fa-trash"></i>
+              Delete Account
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/utils.js"></script>
+  <script src="../js/components.js"></script>
+  <script>
+    // Initialize layout
+    initializeAppLayout('settings');
+
+    // Personalities data
+    const personalities = [
+      {
+        id: 'friendly',
+        name: 'Friendly Guide',
+        icon: 'fa-smile',
+        description: 'Patient, encouraging, and supportive. Perfect for building confidence.'
+      },
+      {
+        id: 'professional',
+        name: 'Professional Tutor',
+        icon: 'fa-user-tie',
+        description: 'Structured, clear, and focused. Great for systematic learning.'
+      },
+      {
+        id: 'enthusiastic',
+        name: 'Enthusiastic Mentor',
+        icon: 'fa-star',
+        description: 'Energetic, motivating, and fun. Makes learning exciting!'
+      },
+      {
+        id: 'socratic',
+        name: 'Socratic Teacher',
+        icon: 'fa-brain',
+        description: 'Thought-provoking and questioning. Encourages critical thinking.'
+      }
+    ];
+
+    let currentPersonality = '';
+
+    // Initialize
+    async function init() {
+      try {
+        const config = await API.get('/config');
+        const user = Auth.getUser();
+
+        // Render personalities
+        renderPersonalities(config.aiPersonality);
+
+        // Load learning preferences
+        document.getElementById('learning-pace').value = config.learningPace;
+        document.getElementById('difficulty-level').value = config.difficultyLevel;
+        document.getElementById('daily-goal').value = config.dailyGoal;
+
+        // Load account info
+        document.getElementById('member-since').textContent = UI.formatDate(user.createdAt);
+
+      } catch (error) {
+        console.error('Error initializing:', error);
+        UI.showAlert('Failed to load settings', 'error');
+      }
+    }
+
+    // Render personalities
+    function renderPersonalities(selectedId) {
+      currentPersonality = selectedId;
+      const container = document.getElementById('personality-options');
+      
+      container.innerHTML = personalities.map(p => `
+        <div class="personality-option ${p.id === selectedId ? 'selected' : ''}" data-id="${p.id}">
+          <input type="radio" name="personality" value="${p.id}" ${p.id === selectedId ? 'checked' : ''}>
+          <div class="personality-header">
+            <div class="personality-icon-box">
+              <i class="fas ${p.icon}"></i>
+            </div>
+            <div class="personality-name">${p.name}</div>
+          </div>
+          <div class="personality-description">${p.description}</div>
+        </div>
+      `).join('');
+
+      // Add click handlers
+      document.querySelectorAll('.personality-option').forEach(option => {
+        option.addEventListener('click', () => {
+          currentPersonality = option.dataset.id;
+          document.querySelectorAll('.personality-option').forEach(o => o.classList.remove('selected'));
+          option.classList.add('selected');
+          option.querySelector('input').checked = true;
+        });
+      });
+    }
+
+    // Tab navigation
+    document.querySelectorAll('.settings-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.dataset.tab;
+        
+        // Update tabs
+        document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Update sections
+        document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+        document.querySelector(`[data-section="${targetTab}"]`).classList.add('active');
+      });
+    });
+
+    // Toggle switches
+    document.querySelectorAll('.toggle-switch').forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        toggle.classList.toggle('active');
+        const setting = toggle.dataset.setting;
+        const enabled = toggle.classList.contains('active');
+        
+        // Save setting (placeholder)
+        console.log(`${setting}: ${enabled}`);
+      });
+    });
+
+    // Save personality
+    document.getElementById('save-personality').addEventListener('click', async () => {
+      try {
+        UI.showLoading();
+        await API.put('/config', { aiPersonality: currentPersonality });
+        UI.hideLoading();
+        UI.showAlert('AI personality updated successfully!', 'success');
+      } catch (error) {
+        UI.hideLoading();
+        UI.showAlert(error.message || 'Failed to update personality', 'error');
+      }
+    });
+
+    // Save learning preferences
+    document.getElementById('learning-preferences-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const preferences = {
+        learningPace: document.getElementById('learning-pace').value,
+        difficultyLevel: document.getElementById('difficulty-level').value,
+        dailyGoal: parseInt(document.getElementById('daily-goal').value)
+      };
+
+      try {
+        UI.showLoading();
+        await API.put('/config', preferences);
+        UI.hideLoading();
+        UI.showAlert('Learning preferences updated successfully!', 'success');
+      } catch (error) {
+        UI.hideLoading();
+        UI.showAlert(error.message || 'Failed to update preferences', 'error');
+      }
+    });
+
+    // Change password
+    document.getElementById('change-password-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const currentPassword = document.getElementById('current-password').value;
+      const newPassword = document.getElementById('new-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+
+      if (newPassword !== confirmPassword) {
+        UI.showAlert('Passwords do not match', 'error');
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        UI.showAlert('Password must be at least 6 characters', 'error');
+        return;
+      }
+
+      try {
+        UI.showLoading();
+        await API.put('/auth/change-password', { currentPassword, newPassword });
+        UI.hideLoading();
+        UI.showAlert('Password changed successfully!', 'success');
+        document.getElementById('change-password-form').reset();
+      } catch (error) {
+        UI.hideLoading();
+        UI.showAlert(error.message || 'Failed to change password', 'error');
+      }
+    });
+
+    // Delete account (placeholder)
+    document.getElementById('delete-account-btn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        UI.showAlert('Account deletion feature coming soon', 'info');
+      }
+    });
+
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>

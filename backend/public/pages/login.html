@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - AI Learning Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .auth-container {
+      background-color: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      width: 100%;
+      max-width: 450px;
+      padding: var(--spacing-2xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .auth-logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2.5rem;
+      margin: 0 auto var(--spacing-lg);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .auth-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+      color: var(--text-primary);
+    }
+
+    .auth-subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .auth-form {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .auth-footer {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .auth-footer a {
+      color: var(--primary-color);
+      font-weight: 500;
+      transition: color var(--transition-fast);
+    }
+
+    .auth-footer a:hover {
+      color: var(--primary-dark);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: var(--spacing-md);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: var(--spacing-sm);
+      font-size: 1rem;
+    }
+
+    .password-toggle:hover {
+      color: var(--text-primary);
+    }
+
+    .form-group-password {
+      position: relative;
+    }
+
+    .forgot-password {
+      text-align: right;
+      margin-top: var(--spacing-sm);
+    }
+
+    .forgot-password a {
+      color: var(--primary-color);
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <h1 class="auth-title">Welcome Back</h1>
+      <p class="auth-subtitle">Sign in to continue your learning journey</p>
+    </div>
+
+    <form id="login-form" class="auth-form">
+      <div class="form-group">
+        <label for="email" class="form-label required">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          class="form-input" 
+          placeholder="Enter your email"
+          required
+        >
+      </div>
+
+      <div class="form-group form-group-password">
+        <label for="password" class="form-label required">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          class="form-input" 
+          placeholder="Enter your password"
+          required
+        >
+        <button type="button" class="password-toggle" id="toggle-password">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+
+      <div class="forgot-password">
+        <a href="#" id="forgot-password-link">Forgot Password?</a>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block mt-lg">
+        <i class="fas fa-sign-in-alt"></i>
+        Sign In
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Don't have an account? <a href="register.html">Sign up here</a>
+    </div>
+  </div>
+
+  <script src="../js/utils.js"></script>
+  <script>
+    // Redirect if already authenticated
+    if (Auth.isAuthenticated()) {
+      if (Auth.isSetupComplete()) {
+        window.location.href = 'dashboard.html';
+      } else {
+        window.location.href = 'setup-wizard.html';
+      }
+    }
+
+    // Password toggle
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('toggle-password');
+
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+      
+      const icon = togglePassword.querySelector('i');
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
+    });
+
+    // Form submission
+    const loginForm = document.getElementById('login-form');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Clear previous errors
+      Validator.clearAllErrors(loginForm);
+
+      // Get form values
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Validate
+      let isValid = true;
+
+      if (!Validator.isValidEmail(email)) {
+        Validator.showError(document.getElementById('email'), 'Please enter a valid email address');
+        isValid = false;
+      }
+
+      if (!Validator.isRequired(password)) {
+        Validator.showError(document.getElementById('password'), 'Password is required');
+        isValid = false;
+      }
+
+      if (!isValid) return;
+
+      // Show loading
+      UI.showLoading();
+
+      try {
+        // Call login API
+        const response = await API.post('/auth/login', { email, password });
+
+        // Check if response has data
+        if (!response.data || !response.data.token) {
+          throw new Error('Invalid response from server');
+        }
+
+        // Store token and user data
+        Auth.setToken(response.data.token);
+        Auth.setUser(response.data.user);
+
+        // Redirect based on setup status
+        if (response.data.user.setupComplete) {
+          window.location.href = 'dashboard.html';
+        } else {
+          window.location.href = 'setup-wizard.html';
+        }
+      } catch (error) {
+        UI.hideLoading();
+        UI.showAlert(error.message || 'Login failed. Please try again.', 'error');
+      }
+    });
+
+    // Forgot password (placeholder)
+    document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      UI.showAlert('Password reset functionality coming soon!', 'info');
+    });
+  </script>
+</body>
+</html>

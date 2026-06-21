@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - AI Learning Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .auth-container {
+      background-color: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      width: 100%;
+      max-width: 500px;
+      padding: var(--spacing-2xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .auth-logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2.5rem;
+      margin: 0 auto var(--spacing-lg);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .auth-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+      color: var(--text-primary);
+    }
+
+    .auth-subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+    }
+
+    .auth-form {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .auth-footer {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .auth-footer a {
+      color: var(--primary-color);
+      font-weight: 500;
+      transition: color var(--transition-fast);
+    }
+
+    .auth-footer a:hover {
+      color: var(--primary-dark);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: var(--spacing-md);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: var(--spacing-sm);
+      font-size: 1rem;
+    }
+
+    .password-toggle:hover {
+      color: var(--text-primary);
+    }
+
+    .form-group-password {
+      position: relative;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-md);
+    }
+
+    @media (max-width: 480px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <i class="fas fa-graduation-cap"></i>
+      </div>
+      <h1 class="auth-title">Create Account</h1>
+      <p class="auth-subtitle">Start your personalized learning journey</p>
+    </div>
+
+    <form id="register-form" class="auth-form">
+      <div class="form-group">
+        <label for="name" class="form-label required">Full Name</label>
+        <input 
+          type="text" 
+          id="name" 
+          class="form-input" 
+          placeholder="Enter your full name"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label required">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          class="form-input" 
+          placeholder="Enter your email"
+          required
+        >
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="class" class="form-label required">Class</label>
+          <select id="class" class="form-select" required>
+            <option value="">Select Class</option>
+            <option value="1">Class 1</option>
+            <option value="2">Class 2</option>
+            <option value="3">Class 3</option>
+            <option value="4">Class 4</option>
+            <option value="5">Class 5</option>
+            <option value="6">Class 6</option>
+            <option value="7">Class 7</option>
+            <option value="8">Class 8</option>
+            <option value="9">Class 9</option>
+            <option value="10">Class 10</option>
+            <option value="11">Class 11</option>
+            <option value="12">Class 12</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="section" class="form-label required">Section</label>
+          <input 
+            type="text" 
+            id="section" 
+            class="form-input" 
+            placeholder="e.g., A"
+            maxlength="1"
+            required
+          >
+        </div>
+      </div>
+
+      <div class="form-group form-group-password">
+        <label for="password" class="form-label required">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          class="form-input" 
+          placeholder="Create a password (min 6 characters)"
+          required
+        >
+        <button type="button" class="password-toggle" id="toggle-password">
+          <i class="fas fa-eye"></i>
+        </button>
+        <p class="form-help">Password must be at least 6 characters long</p>
+      </div>
+
+      <div class="form-group form-group-password">
+        <label for="confirm-password" class="form-label required">Confirm Password</label>
+        <input 
+          type="password" 
+          id="confirm-password" 
+          class="form-input" 
+          placeholder="Re-enter your password"
+          required
+        >
+        <button type="button" class="password-toggle" id="toggle-confirm-password">
+          <i class="fas fa-eye"></i>
+        </button>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block mt-lg">
+        <i class="fas fa-user-plus"></i>
+        Create Account
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a href="login.html">Sign in here</a>
+    </div>
+  </div>
+
+  <script src="../js/utils.js"></script>
+  <script>
+    // Redirect if already authenticated
+    if (Auth.isAuthenticated()) {
+      if (Auth.isSetupComplete()) {
+        window.location.href = 'dashboard.html';
+      } else {
+        window.location.href = 'setup-wizard.html';
+      }
+    }
+
+    // Password toggle for password field
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('toggle-password');
+
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+      
+      const icon = togglePassword.querySelector('i');
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
+    });
+
+    // Password toggle for confirm password field
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
+
+    toggleConfirmPassword.addEventListener('click', () => {
+      const type = confirmPasswordInput.type === 'password' ? 'text' : 'password';
+      confirmPasswordInput.type = type;
+      
+      const icon = toggleConfirmPassword.querySelector('i');
+      icon.classList.toggle('fa-eye');
+      icon.classList.toggle('fa-eye-slash');
+    });
+
+    // Form submission
+    const registerForm = document.getElementById('register-form');
+
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Clear previous errors
+      Validator.clearAllErrors(registerForm);
+
+      // Get form values
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const classValue = document.getElementById('class').value;
+      const section = document.getElementById('section').value.trim().toUpperCase();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+
+      // Validate
+      let isValid = true;
+
+      if (!Validator.isRequired(name)) {
+        Validator.showError(document.getElementById('name'), 'Name is required');
+        isValid = false;
+      }
+
+      if (!Validator.isValidEmail(email)) {
+        Validator.showError(document.getElementById('email'), 'Please enter a valid email address');
+        isValid = false;
+      }
+
+      if (!classValue) {
+        Validator.showError(document.getElementById('class'), 'Please select a class');
+        isValid = false;
+      }
+
+      if (!Validator.isRequired(section)) {
+        Validator.showError(document.getElementById('section'), 'Section is required');
+        isValid = false;
+      }
+
+      if (!Validator.isValidPassword(password)) {
+        Validator.showError(document.getElementById('password'), 'Password must be at least 6 characters');
+        isValid = false;
+      }
+
+      if (password !== confirmPassword) {
+        Validator.showError(document.getElementById('confirm-password'), 'Passwords do not match');
+        isValid = false;
+      }
+
+      if (!isValid) return;
+
+      // Show loading
+      UI.showLoading();
+
+      try {
+        // Call register API
+        const response = await API.post('/auth/register', {
+          name,
+          email,
+          password,
+          class: parseInt(classValue),
+          section
+        });
+
+        // Check if response has data
+        if (!response.data || !response.data.token) {
+          throw new Error('Invalid response from server');
+        }
+
+        // Store token and user data
+        Auth.setToken(response.data.token);
+        Auth.setUser(response.data.user);
+
+        // Show success message
+        UI.hideLoading();
+        UI.showAlert('Account created successfully! Redirecting to setup...', 'success');
+
+        // Redirect to setup wizard after 1 second
+        setTimeout(() => {
+          window.location.href = 'setup-wizard.html';
+        }, 1000);
+      } catch (error) {
+        UI.hideLoading();
+        UI.showAlert(error.message || 'Registration failed. Please try again.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

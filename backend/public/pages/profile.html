@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - AI Learning Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    .profile-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-2xl);
+      margin-bottom: var(--spacing-xl);
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xl);
+    }
+
+    .profile-avatar-large {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 600;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .avatar-upload-overlay {
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .profile-avatar-large:hover .avatar-upload-overlay {
+      opacity: 1;
+    }
+
+    .profile-info h1 {
+      font-size: 2rem;
+      margin-bottom: var(--spacing-sm);
+      color: white;
+    }
+
+    .profile-meta {
+      display: flex;
+      gap: var(--spacing-lg);
+      opacity: 0.9;
+    }
+
+    .profile-meta-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    .profile-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--spacing-lg);
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--spacing-md) 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .info-value {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .stat-box {
+      text-align: center;
+      padding: var(--spacing-lg);
+      background-color: var(--surface-variant);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .stat-box-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .stat-box-label {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    @media (max-width: 768px) {
+      .profile-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .profile-content {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="main-content">
+      <div class="content">
+        <!-- Profile Header -->
+        <div class="profile-header">
+          <div class="profile-avatar-large" id="profile-avatar">
+            <span id="avatar-initials">AB</span>
+            <div class="avatar-upload-overlay">
+              <i class="fas fa-camera"></i>
+            </div>
+            <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+          </div>
+          <div class="profile-info">
+            <h1 id="profile-name">Loading...</h1>
+            <div class="profile-meta">
+              <div class="profile-meta-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span id="profile-class">Class -</span>
+              </div>
+              <div class="profile-meta-item">
+                <i class="fas fa-envelope"></i>
+                <span id="profile-email">email@example.com</span>
+              </div>
+              <div class="profile-meta-item">
+                <i class="fas fa-calendar"></i>
+                <span id="profile-joined">Joined -</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-content">
+          <!-- Main Info -->
+          <div>
+            <!-- Personal Information -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Personal Information</h3>
+                <button class="btn btn-sm btn-ghost" id="edit-profile-btn">
+                  <i class="fas fa-edit"></i>
+                  Edit
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="info-row">
+                  <span class="info-label">Full Name</span>
+                  <span class="info-value" id="info-name">-</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Email</span>
+                  <span class="info-value" id="info-email">-</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Class</span>
+                  <span class="info-value" id="info-class">-</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Section</span>
+                  <span class="info-value" id="info-section">-</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Edit Form (Hidden by default) -->
+            <div class="card hidden" id="edit-form-card">
+              <div class="card-header">
+                <h3 class="card-title">Edit Profile</h3>
+              </div>
+              <div class="card-body">
+                <form id="edit-profile-form">
+                  <div class="form-group">
+                    <label for="edit-name" class="form-label required">Full Name</label>
+                    <input type="text" id="edit-name" class="form-input" required>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="edit-email" class="form-label required">Email</label>
+                    <input type="email" id="edit-email" class="form-input" required>
+                  </div>
+
+                  <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md);">
+                    <div class="form-group">
+                      <label for="edit-class" class="form-label required">Class</label>
+                      <select id="edit-class" class="form-select" required>
+                        <option value="">Select Class</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="edit-section" class="form-label required">Section</label>
+                      <input type="text" id="edit-section" class="form-input" maxlength="1" required>
+                    </div>
+                  </div>
+
+                  <div class="flex gap-md">
+                    <button type="submit" class="btn btn-primary">
+                      <i class="fas fa-save"></i>
+                      Save Changes
+                    </button>
+                    <button type="button" class="btn btn-ghost" id="cancel-edit-btn">
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Learning Preferences -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Learning Preferences</h3>
+                <a href="settings.html" class="btn btn-sm btn-ghost">
+                  <i class="fas fa-cog"></i>
+                  Manage
+                </a>
+              </div>
+              <div class="card-body">
+                <div class="info-row">
+                  <span class="info-label">AI Personality</span>
+                  <span class="info-value" id="info-personality">-</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Learning Pace</span>
+                  <span class="info-value" id="info-pace">-</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Difficulty Level</span>
+                  <span class="info-value" id="info-difficulty">-</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Daily Goal</span>
+                  <span class="info-value" id="info-goal">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar Stats -->
+          <div>
+            <!-- Stats -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Statistics</h3>
+              </div>
+              <div class="card-body">
+                <div class="stat-box">
+                  <div class="stat-box-value" id="stat-chapters">0</div>
+                  <div class="stat-box-label">Chapters Completed</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-value" id="stat-quizzes">0</div>
+                  <div class="stat-box-label">Quizzes Passed</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-value" id="stat-streak">0</div>
+                  <div class="stat-box-label">Day Streak</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-box-value" id="stat-time">0h</div>
+                  <div class="stat-box-label">Time Spent</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Subjects -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">My Subjects</h3>
+              </div>
+              <div class="card-body" id="subjects-list">
+                <p class="text-secondary">Loading...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/utils.js"></script>
+  <script src="../js/components.js"></script>
+  <script>
+    // Initialize layout
+    initializeAppLayout('profile');
+
+    // Initialize
+    async function init() {
+      try {
+        const user = Auth.getUser();
+        const config = await API.get('/config');
+        const progress = await API.get('/progress/summary');
+
+        // Update profile header
+        document.getElementById('profile-name').textContent = user.name;
+        document.getElementById('profile-class').textContent = `Class ${user.class}`;
+        document.getElementById('profile-email').textContent = user.email;
+        document.getElementById('profile-joined').textContent = `Joined ${UI.formatDate(user.createdAt)}`;
+        
+        const initials = UI.getUserInitials(user.name);
+        document.getElementById('avatar-initials').textContent = initials;
+
+        // Update personal info
+        document.getElementById('info-name').textContent = user.name;
+        document.getElementById('info-email').textContent = user.email;
+        document.getElementById('info-class').textContent = user.class;
+        document.getElementById('info-section').textContent = user.section;
+
+        // Update learning preferences
+        document.getElementById('info-personality').textContent = formatPersonality(config.aiPersonality);
+        document.getElementById('info-pace').textContent = formatPace(config.learningPace);
+        document.getElementById('info-difficulty').textContent = formatDifficulty(config.difficultyLevel);
+        document.getElementById('info-goal').textContent = `${config.dailyGoal} minutes`;
+
+        // Update stats
+        document.getElementById('stat-chapters').textContent = progress.chaptersCompleted || 0;
+        document.getElementById('stat-quizzes').textContent = progress.quizzesPassed || 0;
+        document.getElementById('stat-streak').textContent = progress.currentStreak || 0;
+        
+        const hours = Math.floor((progress.totalTimeSpent || 0) / 60);
+        document.getElementById('stat-time').textContent = `${hours}h`;
+
+        // Update subjects
+        renderSubjects(config.subjects);
+
+        // Populate class select
+        populateClassSelect();
+
+      } catch (error) {
+        console.error('Error initializing:', error);
+        UI.showAlert('Failed to load profile data', 'error');
+      }
+    }
+
+    // Format functions
+    function formatPersonality(id) {
+      const map = {
+        friendly: 'Friendly Guide',
+        professional: 'Professional Tutor',
+        enthusiastic: 'Enthusiastic Mentor',
+        socratic: 'Socratic Teacher'
+      };
+      return map[id] || id;
+    }
+
+    function formatPace(pace) {
+      return pace.charAt(0).toUpperCase() + pace.slice(1);
+    }
+
+    function formatDifficulty(level) {
+      return level.charAt(0).toUpperCase() + level.slice(1);
+    }
+
+    // Render subjects
+    function renderSubjects(subjects) {
+      const container = document.getElementById('subjects-list');
+      container.innerHTML = subjects.map(subject => `
+        <div class="flex items-center gap-sm mb-sm">
+          <i class="fas fa-book" style="color: var(--primary-color);"></i>
+          <span>${subject.charAt(0).toUpperCase() + subject.slice(1)}</span>
+        </div>
+      `).join('');
+    }
+
+    // Populate class select
+    function populateClassSelect() {
+      const select = document.getElementById('edit-class');
+      for (let i = 1; i <= 12; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Class ${i}`;
+        select.appendChild(option);
+      }
+    }
+
+    // Edit profile
+    document.getElementById('edit-profile-btn').addEventListener('click', () => {
+      const user = Auth.getUser();
+      
+      // Populate form
+      document.getElementById('edit-name').value = user.name;
+      document.getElementById('edit-email').value = user.email;
+      document.getElementById('edit-class').value = user.class;
+      document.getElementById('edit-section').value = user.section;
+
+      // Show form, hide info
+      document.getElementById('edit-form-card').classList.remove('hidden');
+      document.querySelector('.card').style.display = 'none';
+    });
+
+    // Cancel edit
+    document.getElementById('cancel-edit-btn').addEventListener('click', () => {
+      document.getElementById('edit-form-card').classList.add('hidden');
+      document.querySelector('.card').style.display = 'block';
+    });
+
+    // Submit edit form
+    document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        name: document.getElementById('edit-name').value,
+        email: document.getElementById('edit-email').value,
+        class: parseInt(document.getElementById('edit-class').value),
+        section: document.getElementById('edit-section').value.toUpperCase()
+      };
+
+      try {
+        UI.showLoading();
+        const response = await API.put('/auth/profile', formData);
+        
+        // Update stored user data
+        Auth.setUser(response.user);
+        
+        UI.hideLoading();
+        UI.showAlert('Profile updated successfully!', 'success');
+        
+        // Hide form, show info
+        document.getElementById('edit-form-card').classList.add('hidden');
+        document.querySelector('.card').style.display = 'block';
+        
+        // Reload page to show updated data
+        setTimeout(() => location.reload(), 1000);
+      } catch (error) {
+        UI.hideLoading();
+        UI.showAlert(error.message || 'Failed to update profile', 'error');
+      }
+    });
+
+    // Avatar upload (placeholder)
+    document.getElementById('profile-avatar').addEventListener('click', () => {
+      document.getElementById('avatar-upload').click();
+    });
+
+    document.getElementById('avatar-upload').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        UI.showAlert('Avatar upload feature coming soon!', 'info');
+      }
+    });
+
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>

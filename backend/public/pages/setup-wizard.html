@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Wizard - AI Learning Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .wizard-container {
+      background-color: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      width: 100%;
+      max-width: 700px;
+      overflow: hidden;
+    }
+
+    .wizard-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: var(--spacing-xl);
+      text-align: center;
+    }
+
+    .wizard-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .wizard-subtitle {
+      opacity: 0.9;
+    }
+
+    .progress-bar-container {
+      background-color: rgba(255, 255, 255, 0.2);
+      height: 8px;
+      border-radius: var(--radius-full);
+      margin-top: var(--spacing-lg);
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      background-color: white;
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width var(--transition-base);
+    }
+
+    .wizard-body {
+      padding: var(--spacing-2xl);
+    }
+
+    .wizard-step {
+      display: none;
+    }
+
+    .wizard-step.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .step-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+      color: var(--text-primary);
+    }
+
+    .step-description {
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .wizard-footer {
+      padding: var(--spacing-lg) var(--spacing-2xl);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      gap: var(--spacing-md);
+    }
+
+    /* Subject Selection */
+    .subject-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: var(--spacing-md);
+    }
+
+    .subject-card {
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .subject-card:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .subject-card.selected {
+      border-color: var(--primary-color);
+      background-color: rgba(98, 0, 238, 0.05);
+    }
+
+    .subject-card input[type="checkbox"] {
+      display: none;
+    }
+
+    .subject-icon {
+      font-size: 2rem;
+      margin-bottom: var(--spacing-sm);
+      color: var(--primary-color);
+    }
+
+    .subject-name {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    /* AI Personality Selection */
+    .personality-grid {
+      display: grid;
+      gap: var(--spacing-md);
+    }
+
+    .personality-card {
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      gap: var(--spacing-md);
+    }
+
+    .personality-card:hover {
+      border-color: var(--primary-color);
+      box-shadow: var(--shadow-md);
+    }
+
+    .personality-card.selected {
+      border-color: var(--primary-color);
+      background-color: rgba(98, 0, 238, 0.05);
+    }
+
+    .personality-card input[type="radio"] {
+      display: none;
+    }
+
+    .personality-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.75rem;
+      flex-shrink: 0;
+    }
+
+    .personality-content {
+      flex: 1;
+    }
+
+    .personality-name {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-xs);
+      color: var(--text-primary);
+    }
+
+    .personality-description {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    /* Class Selection */
+    .class-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: var(--spacing-md);
+    }
+
+    .class-card {
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .class-card:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+    }
+
+    .class-card.selected {
+      border-color: var(--primary-color);
+      background-color: rgba(98, 0, 238, 0.05);
+    }
+
+    .class-card input[type="radio"] {
+      display: none;
+    }
+
+    .class-number {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+  </style>
+</head>
+<body>
+  <div class="wizard-container">
+    <div class="wizard-header">
+      <h1 class="wizard-title">Let's Personalize Your Learning</h1>
+      <p class="wizard-subtitle">Complete these steps to get started</p>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar" style="width: 25%"></div>
+      </div>
+    </div>
+
+    <div class="wizard-body">
+      <!-- Step 1: Class Selection -->
+      <div class="wizard-step active" data-step="1">
+        <h2 class="step-title">Select Your Class</h2>
+        <p class="step-description">Choose your current class level</p>
+        
+        <div class="class-grid" id="class-grid">
+          <!-- Classes will be generated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Step 2: Subject Selection -->
+      <div class="wizard-step" data-step="2">
+        <h2 class="step-title">Choose Your Subjects</h2>
+        <p class="step-description">Select the subjects you want to learn (select at least one)</p>
+        
+        <div class="subject-grid" id="subject-grid">
+          <!-- Subjects will be generated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Step 3: AI Personality -->
+      <div class="wizard-step" data-step="3">
+        <h2 class="step-title">Choose Your AI Teacher</h2>
+        <p class="step-description">Select the teaching style that suits you best</p>
+        
+        <div class="personality-grid" id="personality-grid">
+          <!-- Personalities will be generated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Step 4: Learning Preferences -->
+      <div class="wizard-step" data-step="4">
+        <h2 class="step-title">Learning Preferences</h2>
+        <p class="step-description">Customize your learning experience</p>
+        
+        <div class="form-group">
+          <label for="learning-pace" class="form-label">Learning Pace</label>
+          <select id="learning-pace" class="form-select">
+            <option value="slow">Slow & Steady</option>
+            <option value="moderate" selected>Moderate</option>
+            <option value="fast">Fast & Intensive</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="difficulty-level" class="form-label">Difficulty Level</label>
+          <select id="difficulty-level" class="form-select">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate" selected>Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="daily-goal" class="form-label">Daily Learning Goal (minutes)</label>
+          <select id="daily-goal" class="form-select">
+            <option value="15">15 minutes</option>
+            <option value="30" selected>30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60">60 minutes</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="wizard-footer">
+      <button type="button" class="btn btn-ghost" id="prev-btn" style="display: none;">
+        <i class="fas fa-arrow-left"></i>
+        Previous
+      </button>
+      <button type="button" class="btn btn-primary" id="next-btn">
+        Next
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <script src="../js/utils.js"></script>
+  <script>
+    // Check authentication
+    if (!requireAuth()) {
+      throw new Error('Not authenticated');
+    }
+
+    // Wizard state
+    let currentStep = 1;
+    const totalSteps = 4;
+    const wizardData = {
+      class: null,
+      subjects: [],
+      aiPersonality: null,
+      learningPace: 'moderate',
+      difficultyLevel: 'intermediate',
+      dailyGoal: 30
+    };
+
+    // Subjects data
+    const subjects = [
+      { id: 'mathematics', name: 'Mathematics', icon: 'fa-calculator' },
+      { id: 'science', name: 'Science', icon: 'fa-flask' },
+      { id: 'english', name: 'English', icon: 'fa-book' },
+      { id: 'hindi', name: 'Hindi', icon: 'fa-language' },
+      { id: 'social-studies', name: 'Social Studies', icon: 'fa-globe' },
+      { id: 'computer-science', name: 'Computer Science', icon: 'fa-laptop-code' },
+      { id: 'physics', name: 'Physics', icon: 'fa-atom' },
+      { id: 'chemistry', name: 'Chemistry', icon: 'fa-vial' },
+      { id: 'biology', name: 'Biology', icon: 'fa-dna' },
+      { id: 'history', name: 'History', icon: 'fa-landmark' },
+      { id: 'geography', name: 'Geography', icon: 'fa-map' },
+      { id: 'economics', name: 'Economics', icon: 'fa-chart-line' }
+    ];
+
+    // AI Personalities
+    const personalities = [
+      {
+        id: 'friendly',
+        name: 'Friendly Guide',
+        icon: 'fa-smile',
+        description: 'Patient, encouraging, and supportive. Perfect for building confidence.'
+      },
+      {
+        id: 'professional',
+        name: 'Professional Tutor',
+        icon: 'fa-user-tie',
+        description: 'Structured, clear, and focused. Great for systematic learning.'
+      },
+      {
+        id: 'enthusiastic',
+        name: 'Enthusiastic Mentor',
+        icon: 'fa-star',
+        description: 'Energetic, motivating, and fun. Makes learning exciting!'
+      },
+      {
+        id: 'socratic',
+        name: 'Socratic Teacher',
+        icon: 'fa-brain',
+        description: 'Thought-provoking and questioning. Encourages critical thinking.'
+      }
+    ];
+
+    // Initialize
+    function init() {
+      renderClassSelection();
+      renderSubjectSelection();
+      renderPersonalitySelection();
+      updateProgressBar();
+      
+      // Get user data
+      const user = Auth.getUser();
+      if (user && user.class) {
+        wizardData.class = user.class;
+        selectClass(user.class);
+      }
+    }
+
+    // Render class selection
+    function renderClassSelection() {
+      const grid = document.getElementById('class-grid');
+      for (let i = 1; i <= 12; i++) {
+        const card = document.createElement('div');
+        card.className = 'class-card';
+        card.innerHTML = `
+          <input type="radio" name="class" value="${i}" id="class-${i}">
+          <div class="class-number">${i}</div>
+        `;
+        card.addEventListener('click', () => selectClass(i));
+        grid.appendChild(card);
+      }
+    }
+
+    // Select class
+    function selectClass(classNum) {
+      wizardData.class = classNum;
+      document.querySelectorAll('.class-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      const selectedCard = document.querySelector(`#class-${classNum}`).parentElement;
+      selectedCard.classList.add('selected');
+    }
+
+    // Render subject selection
+    function renderSubjectSelection() {
+      const grid = document.getElementById('subject-grid');
+      subjects.forEach(subject => {
+        const card = document.createElement('div');
+        card.className = 'subject-card';
+        card.innerHTML = `
+          <input type="checkbox" id="subject-${subject.id}" value="${subject.id}">
+          <div class="subject-icon"><i class="fas ${subject.icon}"></i></div>
+          <div class="subject-name">${subject.name}</div>
+        `;
+        card.addEventListener('click', () => toggleSubject(subject.id));
+        grid.appendChild(card);
+      });
+    }
+
+    // Toggle subject
+    function toggleSubject(subjectId) {
+      const checkbox = document.getElementById(`subject-${subjectId}`);
+      const card = checkbox.parentElement;
+      
+      if (wizardData.subjects.includes(subjectId)) {
+        wizardData.subjects = wizardData.subjects.filter(s => s !== subjectId);
+        card.classList.remove('selected');
+        checkbox.checked = false;
+      } else {
+        wizardData.subjects.push(subjectId);
+        card.classList.add('selected');
+        checkbox.checked = true;
+      }
+    }
+
+    // Render personality selection
+    function renderPersonalitySelection() {
+      const grid = document.getElementById('personality-grid');
+      personalities.forEach(personality => {
+        const card = document.createElement('div');
+        card.className = 'personality-card';
+        card.innerHTML = `
+          <input type="radio" name="personality" value="${personality.id}" id="personality-${personality.id}">
+          <div class="personality-icon"><i class="fas ${personality.icon}"></i></div>
+          <div class="personality-content">
+            <div class="personality-name">${personality.name}</div>
+            <div class="personality-description">${personality.description}</div>
+          </div>
+        `;
+        card.addEventListener('click', () => selectPersonality(personality.id));
+        grid.appendChild(card);
+      });
+    }
+
+    // Select personality
+    function selectPersonality(personalityId) {
+      wizardData.aiPersonality = personalityId;
+      document.querySelectorAll('.personality-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      const selectedCard = document.querySelector(`#personality-${personalityId}`).parentElement;
+      selectedCard.classList.add('selected');
+    }
+
+    // Update progress bar
+    function updateProgressBar() {
+      const progress = (currentStep / totalSteps) * 100;
+      document.getElementById('progress-bar').style.width = `${progress}%`;
+    }
+
+    // Show step
+    function showStep(step) {
+      document.querySelectorAll('.wizard-step').forEach(s => {
+        s.classList.remove('active');
+      });
+      document.querySelector(`[data-step="${step}"]`).classList.add('active');
+      
+      // Update buttons
+      const prevBtn = document.getElementById('prev-btn');
+      const nextBtn = document.getElementById('next-btn');
+      
+      prevBtn.style.display = step === 1 ? 'none' : 'flex';
+      
+      if (step === totalSteps) {
+        nextBtn.innerHTML = '<i class="fas fa-check"></i> Complete Setup';
+      } else {
+        nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+      }
+      
+      updateProgressBar();
+    }
+
+    // Validate step
+    function validateStep(step) {
+      switch (step) {
+        case 1:
+          if (!wizardData.class) {
+            UI.showAlert('Please select your class', 'warning');
+            return false;
+          }
+          break;
+        case 2:
+          if (wizardData.subjects.length === 0) {
+            UI.showAlert('Please select at least one subject', 'warning');
+            return false;
+          }
+          break;
+        case 3:
+          if (!wizardData.aiPersonality) {
+            UI.showAlert('Please select an AI teacher personality', 'warning');
+            return false;
+          }
+          break;
+        case 4:
+          wizardData.learningPace = document.getElementById('learning-pace').value;
+          wizardData.difficultyLevel = document.getElementById('difficulty-level').value;
+          wizardData.dailyGoal = parseInt(document.getElementById('daily-goal').value);
+          break;
+      }
+      return true;
+    }
+
+    // Next button
+    document.getElementById('next-btn').addEventListener('click', async () => {
+      if (!validateStep(currentStep)) return;
+      
+      if (currentStep < totalSteps) {
+        currentStep++;
+        showStep(currentStep);
+      } else {
+        // Complete setup
+        await completeSetup();
+      }
+    });
+
+    // Previous button
+    document.getElementById('prev-btn').addEventListener('click', () => {
+      if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+      }
+    });
+
+    // Complete setup
+    async function completeSetup() {
+      UI.showLoading();
+      
+      try {
+        const response = await API.post('/config/setup', wizardData);
+        
+        // Update user data
+        const user = Auth.getUser();
+        user.setupComplete = true;
+        Auth.setUser(user);
+        
+        UI.hideLoading();
+        UI.showAlert('Setup completed successfully! Redirecting to dashboard...', 'success');
+        
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1500);
+      } catch (error) {
+        UI.hideLoading();
+        UI.showAlert(error.message || 'Setup failed. Please try again.', 'error');
+      }
+    }
+
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>

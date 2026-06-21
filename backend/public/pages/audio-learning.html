@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Learning - AI Learning Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    .learning-container {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: var(--spacing-lg);
+      height: calc(100vh - var(--header-height) - var(--spacing-xl) * 2);
+    }
+
+    .learning-main {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-lg);
+    }
+
+    .learning-controls {
+      background-color: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .audio-interface {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-2xl);
+      color: white;
+      text-align: center;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .audio-interface::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .audio-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .ai-avatar {
+      width: 120px;
+      height: 120px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      margin: 0 auto var(--spacing-lg);
+      border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .ai-avatar.recording {
+      animation: recordPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes recordPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+      50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+    }
+
+    .audio-status {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .audio-hint {
+      opacity: 0.9;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .record-button {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: white;
+      color: var(--primary-color);
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .record-button:hover {
+      transform: scale(1.1);
+    }
+
+    .record-button.recording {
+      background-color: var(--error);
+      color: white;
+    }
+
+    .conversation-history {
+      background-color: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow-sm);
+      overflow-y: auto;
+      max-height: calc(100vh - var(--header-height) - var(--spacing-xl) * 2);
+    }
+
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-lg);
+      padding-bottom: var(--spacing-md);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .history-title {
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
+
+    .message {
+      margin-bottom: var(--spacing-md);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.user {
+      background-color: var(--primary-color);
+      color: white;
+      margin-left: var(--spacing-lg);
+    }
+
+    .message.ai {
+      background-color: var(--surface-variant);
+      margin-right: var(--spacing-lg);
+    }
+
+    .message-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      margin-bottom: var(--spacing-xs);
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .message-content {
+      font-size: 0.9375rem;
+      line-height: 1.5;
+    }
+
+    .message-time {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-top: var(--spacing-xs);
+    }
+
+    .personality-indicator {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      padding: var(--spacing-sm) var(--spacing-md);
+      background-color: rgba(98, 0, 238, 0.1);
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .learning-container {
+        grid-template-columns: 1fr;
+      }
+
+      .conversation-history {
+        max-height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="main-content">
+      <div class="content">
+        <div class="page-header">
+          <h1 class="page-title">Audio Learning</h1>
+          <p class="page-subtitle">Have a conversation with your AI teacher</p>
+        </div>
+
+        <div class="learning-container">
+          <div class="learning-main">
+            <!-- Controls -->
+            <div class="learning-controls">
+              <div class="control-row">
+                <div class="form-group m-0">
+                  <label for="subject-select" class="form-label">Subject</label>
+                  <select id="subject-select" class="form-select">
+                    <option value="">Select Subject</option>
+                  </select>
+                </div>
+
+                <div class="form-group m-0">
+                  <label for="chapter-select" class="form-label">Chapter</label>
+                  <select id="chapter-select" class="form-select" disabled>
+                    <option value="">Select Chapter</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="personality-indicator" id="personality-indicator">
+                <i class="fas fa-robot"></i>
+                <span id="personality-name">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Audio Interface -->
+            <div class="audio-interface">
+              <div class="audio-content">
+                <div class="ai-avatar" id="ai-avatar">
+                  <i class="fas fa-robot"></i>
+                </div>
+                <div class="audio-status" id="audio-status">Ready to Learn</div>
+                <div class="audio-hint" id="audio-hint">Click the button below to start talking</div>
+                <button class="record-button" id="record-button">
+                  <i class="fas fa-microphone"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Conversation History -->
+          <div class="conversation-history">
+            <div class="history-header">
+              <h3 class="history-title">Conversation</h3>
+              <button class="btn btn-sm btn-ghost" id="save-conversation">
+                <i class="fas fa-save"></i>
+              </button>
+            </div>
+            <div id="messages-container">
+              <p class="text-secondary text-center">No messages yet. Start a conversation!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/components.js"></script>
+  <script>
+    // Initialize layout
+    initializeAppLayout('audio-learning');
+
+    // State
+    let isRecording = false;
+    let socket = null;
+    let mediaStream = null;
+    let source = null;
+    let currentSubject = '';
+    let currentChapter = '';
+    let messages = [];
+
+    // Initialize
+    async function init() {
+      try {
+        // Load user configuration
+        const config = await API.get('/config');
+        
+        // Update personality indicator
+        const personalityName = getPersonalityName(config.aiPersonality);
+        document.getElementById('personality-name').textContent = personalityName;
+
+        // Load subjects
+        loadSubjects(config.subjects);
+
+        // Initialize socket
+        initializeSocket();
+
+      } catch (error) {
+        console.error('Error initializing:', error);
+        UI.showAlert('Failed to load configuration', 'error');
+      }
+    }
+
+    // Get personality name
+    function getPersonalityName(id) {
+      const personalities = {
+        friendly: 'Friendly Guide',
+        professional: 'Professional Tutor',
+        enthusiastic: 'Enthusiastic Mentor',
+        socratic: 'Socratic Teacher'
+      };
+      return personalities[id] || 'AI Teacher';
+    }
+
+    // Load subjects
+    function loadSubjects(subjects) {
+      const select = document.getElementById('subject-select');
+      subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject.charAt(0).toUpperCase() + subject.slice(1);
+        select.appendChild(option);
+      });
+
+      select.addEventListener('change', (e) => {
+        currentSubject = e.target.value;
+        loadChapters(currentSubject);
+      });
+    }
+
+    // Load chapters (placeholder)
+    function loadChapters(subject) {
+      const select = document.getElementById('chapter-select');
+      select.innerHTML = '<option value="">Select Chapter</option>';
+      
+      if (!subject) {
+        select.disabled = true;
+        return;
+      }
+
+      // Placeholder chapters
+      const chapters = [
+        'Chapter 1: Introduction',
+        'Chapter 2: Fundamentals',
+        'Chapter 3: Advanced Concepts',
+        'Chapter 4: Applications',
+        'Chapter 5: Practice'
+      ];
+
+      chapters.forEach((chapter, index) => {
+        const option = document.createElement('option');
+        option.value = `chapter-${index + 1}`;
+        option.textContent = chapter;
+        select.appendChild(option);
+      });
+
+      select.disabled = false;
+      select.addEventListener('change', (e) => {
+        currentChapter = e.target.value;
+      });
+    }
+
+    // Initialize socket
+    function initializeSocket() {
+      socket = io();
+
+      socket.on('audioStream', (data) => {
+        playAudioData(data);
+      });
+
+      socket.on('transcription', (data) => {
+        addMessage('user', data.text);
+      });
+
+      socket.on('aiResponse', (data) => {
+        addMessage('ai', data.text);
+      });
+    }
+
+    // Record button
+    document.getElementById('record-button').addEventListener('click', () => {
+      if (!currentSubject || !currentChapter) {
+        UI.showAlert('Please select a subject and chapter first', 'warning');
+        return;
+      }
+
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    });
+
+    // Start recording
+    async function startRecording() {
+      try {
+        isRecording = true;
+        
+        // Update UI
+        document.getElementById('record-button').classList.add('recording');
+        document.getElementById('record-button').innerHTML = '<i class="fas fa-stop"></i>';
+        document.getElementById('ai-avatar').classList.add('recording');
+        document.getElementById('audio-status').textContent = 'Listening...';
+        document.getElementById('audio-hint').textContent = 'Speak now, I\'m listening';
+
+        // Get microphone access
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        // Start audio processing (simplified version)
+        // In production, implement full audio worklet as in original index.html
+        
+      } catch (error) {
+        console.error('Error starting recording:', error);
+        UI.showAlert('Failed to access microphone', 'error');
+        stopRecording();
+      }
+    }
+
+    // Stop recording
+    function stopRecording() {
+      isRecording = false;
+
+      // Stop media stream
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream = null;
+      }
+
+      // Update UI
+      document.getElementById('record-button').classList.remove('recording');
+      document.getElementById('record-button').innerHTML = '<i class="fas fa-microphone"></i>';
+      document.getElementById('ai-avatar').classList.remove('recording');
+      document.getElementById('audio-status').textContent = 'Ready to Learn';
+      document.getElementById('audio-hint').textContent = 'Click the button below to start talking';
+    }
+
+    // Add message to conversation
+    function addMessage(type, text) {
+      const container = document.getElementById('messages-container');
+      
+      // Remove placeholder
+      if (container.querySelector('.text-secondary')) {
+        container.innerHTML = '';
+      }
+
+      const message = {
+        type,
+        text,
+        time: new Date()
+      };
+      messages.push(message);
+
+      const messageEl = document.createElement('div');
+      messageEl.className = `message ${type}`;
+      messageEl.innerHTML = `
+        <div class="message-header">
+          <i class="fas fa-${type === 'user' ? 'user' : 'robot'}"></i>
+          ${type === 'user' ? 'You' : 'AI Teacher'}
+        </div>
+        <div class="message-content">${text}</div>
+        <div class="message-time">${UI.formatTime(message.time)}</div>
+      `;
+
+      container.appendChild(messageEl);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Play audio data
+    function playAudioData(base64Data) {
+      // Implement audio playback (simplified)
+      // In production, use full implementation from original index.html
+    }
+
+    // Save conversation
+    document.getElementById('save-conversation').addEventListener('click', async () => {
+      if (messages.length === 0) {
+        UI.showAlert('No conversation to save', 'warning');
+        return;
+      }
+
+      try {
+        UI.showLoading();
+        
+        await API.post('/progress/conversation', {
+          subject: currentSubject,
+          chapter: currentChapter,
+          messages: messages
+        });
+
+        UI.hideLoading();
+        UI.showAlert('Conversation saved successfully!', 'success');
+      } catch (error) {
+        UI.hideLoading();
+        UI.showAlert('Failed to save conversation', 'error');
+      }
+    });
+
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>

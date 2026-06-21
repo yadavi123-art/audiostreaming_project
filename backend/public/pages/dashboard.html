@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - AI Learning Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    .welcome-banner {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      margin-bottom: var(--spacing-xl);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .welcome-content h2 {
+      font-size: 1.75rem;
+      margin-bottom: var(--spacing-sm);
+      color: white;
+    }
+
+    .welcome-content p {
+      opacity: 0.9;
+      margin: 0;
+    }
+
+    .welcome-icon {
+      font-size: 4rem;
+      opacity: 0.2;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .stat-card {
+      background-color: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-fast);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: white;
+    }
+
+    .stat-icon.primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    }
+
+    .stat-icon.success {
+      background: linear-gradient(135deg, var(--success), #66bb6a);
+    }
+
+    .stat-icon.warning {
+      background: linear-gradient(135deg, var(--warning), #ffb74d);
+    }
+
+    .stat-icon.info {
+      background: linear-gradient(135deg, var(--info), #64b5f6);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .quick-action-btn {
+      background-color: var(--surface);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .quick-action-btn:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .quick-action-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.75rem;
+    }
+
+    .quick-action-label {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: var(--spacing-lg);
+    }
+
+    .recent-item {
+      display: flex;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      transition: background-color var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .recent-item:hover {
+      background-color: var(--surface-variant);
+    }
+
+    .recent-item-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .recent-item-content {
+      flex: 1;
+    }
+
+    .recent-item-title {
+      font-weight: 500;
+      margin-bottom: var(--spacing-xs);
+      color: var(--text-primary);
+    }
+
+    .recent-item-meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .upcoming-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      border-left: 3px solid var(--primary-color);
+      background-color: var(--surface-variant);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .upcoming-date {
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .upcoming-day {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .upcoming-month {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .upcoming-content {
+      flex: 1;
+    }
+
+    .upcoming-title {
+      font-weight: 500;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .upcoming-time {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .streak-counter {
+      text-align: center;
+      padding: var(--spacing-xl);
+    }
+
+    .streak-number {
+      font-size: 3rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .streak-label {
+      color: var(--text-secondary);
+      margin-top: var(--spacing-sm);
+    }
+
+    .streak-icon {
+      font-size: 2rem;
+      color: var(--warning);
+      margin-bottom: var(--spacing-md);
+    }
+
+    @media (max-width: 768px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .welcome-banner {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .welcome-icon {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="main-content">
+      <div class="content">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+          <div class="welcome-content">
+            <h2 id="welcome-message">Welcome back!</h2>
+            <p>Ready to continue your learning journey?</p>
+          </div>
+          <div class="welcome-icon">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon primary">
+                <i class="fas fa-book-open"></i>
+              </div>
+            </div>
+            <div class="stat-value" id="chapters-completed">0</div>
+            <div class="stat-label">Chapters Completed</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon success">
+                <i class="fas fa-check-circle"></i>
+              </div>
+            </div>
+            <div class="stat-value" id="quizzes-passed">0</div>
+            <div class="stat-label">Quizzes Passed</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon warning">
+                <i class="fas fa-fire"></i>
+              </div>
+            </div>
+            <div class="stat-value" id="current-streak">0</div>
+            <div class="stat-label">Day Streak</div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <div class="stat-icon info">
+                <i class="fas fa-clock"></i>
+              </div>
+            </div>
+            <div class="stat-value" id="time-spent">0h</div>
+            <div class="stat-label">Time Spent</div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Quick Actions</h3>
+          </div>
+          <div class="quick-actions">
+            <a href="audio-learning.html" class="quick-action-btn">
+              <div class="quick-action-icon">
+                <i class="fas fa-microphone"></i>
+              </div>
+              <div class="quick-action-label">Start Learning</div>
+            </a>
+
+            <a href="discussions.html" class="quick-action-btn">
+              <div class="quick-action-icon">
+                <i class="fas fa-comments"></i>
+              </div>
+              <div class="quick-action-label">Ask Question</div>
+            </a>
+
+            <a href="progress.html" class="quick-action-btn">
+              <div class="quick-action-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="quick-action-label">View Progress</div>
+            </a>
+
+            <a href="settings.html" class="quick-action-btn">
+              <div class="quick-action-icon">
+                <i class="fas fa-cog"></i>
+              </div>
+              <div class="quick-action-label">Settings</div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="content-grid">
+          <!-- Recent Conversations -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Recent Conversations</h3>
+              <a href="audio-learning.html" class="btn btn-sm btn-ghost">View All</a>
+            </div>
+            <div class="card-body" id="recent-conversations">
+              <p class="text-secondary">No recent conversations</p>
+            </div>
+          </div>
+
+          <!-- Sidebar Content -->
+          <div>
+            <!-- Streak Counter -->
+            <div class="card">
+              <div class="streak-counter">
+                <div class="streak-icon">
+                  <i class="fas fa-fire"></i>
+                </div>
+                <div class="streak-number" id="streak-display">0</div>
+                <div class="streak-label">Day Learning Streak</div>
+                <p class="text-secondary text-sm mt-md">Keep it up! 🎉</p>
+              </div>
+            </div>
+
+            <!-- Upcoming Quizzes -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Upcoming Quizzes</h3>
+              </div>
+              <div class="card-body" id="upcoming-quizzes">
+                <p class="text-secondary">No upcoming quizzes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/utils.js"></script>
+  <script src="../js/components.js"></script>
+  <script>
+    // Initialize layout
+    initializeAppLayout('dashboard');
+
+    // Load dashboard data
+    async function loadDashboardData() {
+      try {
+        const user = Auth.getUser();
+        
+        // Update welcome message
+        document.getElementById('welcome-message').textContent = `Welcome back, ${user.name.split(' ')[0]}!`;
+
+        // Load progress summary
+        const progressData = await API.get('/progress/summary');
+        
+        // Update stats
+        document.getElementById('chapters-completed').textContent = progressData.chaptersCompleted || 0;
+        document.getElementById('quizzes-passed').textContent = progressData.quizzesPassed || 0;
+        document.getElementById('current-streak').textContent = progressData.currentStreak || 0;
+        document.getElementById('streak-display').textContent = progressData.currentStreak || 0;
+        
+        const hours = Math.floor((progressData.totalTimeSpent || 0) / 60);
+        document.getElementById('time-spent').textContent = `${hours}h`;
+
+        // Load recent conversations
+        await loadRecentConversations();
+
+        // Load upcoming quizzes (placeholder)
+        loadUpcomingQuizzes();
+
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      }
+    }
+
+    // Load recent conversations
+    async function loadRecentConversations() {
+      try {
+        const conversations = await API.get('/progress/conversations?limit=5');
+        const container = document.getElementById('recent-conversations');
+        
+        if (conversations.length === 0) {
+          container.innerHTML = '<p class="text-secondary">No recent conversations</p>';
+          return;
+        }
+
+        container.innerHTML = conversations.map(conv => `
+          <div class="recent-item">
+            <div class="recent-item-icon">
+              <i class="fas fa-microphone"></i>
+            </div>
+            <div class="recent-item-content">
+              <div class="recent-item-title">${conv.subject} - ${conv.chapter}</div>
+              <div class="recent-item-meta">
+                <i class="fas fa-clock"></i> ${UI.formatRelativeTime(conv.createdAt)}
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        console.error('Error loading conversations:', error);
+      }
+    }
+
+    // Load upcoming quizzes (placeholder)
+    function loadUpcomingQuizzes() {
+      const container = document.getElementById('upcoming-quizzes');
+      
+      // Placeholder data
+      const quizzes = [
+        { subject: 'Mathematics', chapter: 'Algebra', date: new Date(Date.now() + 86400000) },
+        { subject: 'Science', chapter: 'Physics', date: new Date(Date.now() + 172800000) }
+      ];
+
+      if (quizzes.length === 0) {
+        container.innerHTML = '<p class="text-secondary">No upcoming quizzes</p>';
+        return;
+      }
+
+      container.innerHTML = quizzes.map(quiz => {
+        const date = new Date(quiz.date);
+        const day = date.getDate();
+        const month = date.toLocaleString('en-US', { month: 'short' });
+        
+        return `
+          <div class="upcoming-item">
+            <div class="upcoming-date">
+              <div class="upcoming-day">${day}</div>
+              <div class="upcoming-month">${month}</div>
+            </div>
+            <div class="upcoming-content">
+              <div class="upcoming-title">${quiz.subject}</div>
+              <div class="upcoming-time">${quiz.chapter}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Load data on page load
+    loadDashboardData();
+  </script>
+</body>
+</html>

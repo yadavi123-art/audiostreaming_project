@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discussions - AI Learning Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    .discussions-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .filters {
+      display: flex;
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .subject-tabs {
+      display: flex;
+      gap: var(--spacing-sm);
+      overflow-x: auto;
+      padding-bottom: var(--spacing-sm);
+    }
+
+    .tab {
+      padding: var(--spacing-sm) var(--spacing-lg);
+      border-radius: var(--radius-full);
+      background-color: var(--surface-variant);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+      border: 2px solid transparent;
+    }
+
+    .tab:hover {
+      background-color: var(--border-color);
+    }
+
+    .tab.active {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .discussion-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+    }
+
+    .discussion-item {
+      background-color: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .discussion-item:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .discussion-header {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .discussion-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .discussion-content {
+      flex: 1;
+    }
+
+    .discussion-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: var(--spacing-xs);
+      color: var(--text-primary);
+    }
+
+    .discussion-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .discussion-preview {
+      color: var(--text-secondary);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .discussion-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    .discussion-tags {
+      display: flex;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+    }
+
+    .discussion-stats {
+      display: flex;
+      gap: var(--spacing-lg);
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
+
+    /* New Discussion Modal */
+    .modal-overlay {
+      display: none;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="main-content">
+      <div class="content">
+        <div class="discussions-header">
+          <div>
+            <h1 class="page-title">Discussions</h1>
+            <p class="page-subtitle">Ask questions and help your classmates</p>
+          </div>
+          <button class="btn btn-primary" id="new-discussion-btn">
+            <i class="fas fa-plus"></i>
+            New Discussion
+          </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="card">
+          <div class="filters">
+            <div class="form-group m-0" style="min-width: 150px;">
+              <select id="class-filter" class="form-select">
+                <option value="">All Classes</option>
+              </select>
+            </div>
+
+            <div class="form-group m-0" style="flex: 1; min-width: 200px;">
+              <input 
+                type="text" 
+                id="search-input" 
+                class="form-input" 
+                placeholder="Search discussions..."
+              >
+            </div>
+          </div>
+
+          <div class="subject-tabs" id="subject-tabs">
+            <div class="tab active" data-subject="all">All Subjects</div>
+          </div>
+        </div>
+
+        <!-- Discussion List -->
+        <div class="discussion-list" id="discussion-list">
+          <p class="text-secondary text-center">Loading discussions...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Discussion Modal -->
+  <div class="modal-overlay" id="new-discussion-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Start a New Discussion</h2>
+        <button class="modal-close" id="close-modal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="new-discussion-form">
+          <div class="form-group">
+            <label for="discussion-subject" class="form-label required">Subject</label>
+            <select id="discussion-subject" class="form-select" required>
+              <option value="">Select Subject</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="discussion-chapter" class="form-label">Chapter (Optional)</label>
+            <input 
+              type="text" 
+              id="discussion-chapter" 
+              class="form-input" 
+              placeholder="e.g., Chapter 5"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="discussion-title" class="form-label required">Title</label>
+            <input 
+              type="text" 
+              id="discussion-title" 
+              class="form-input" 
+              placeholder="What's your question?"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="discussion-content" class="form-label required">Description</label>
+            <textarea 
+              id="discussion-content" 
+              class="form-textarea" 
+              placeholder="Provide more details about your question..."
+              rows="5"
+              required
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="discussion-tags" class="form-label">Tags (comma-separated)</label>
+            <input 
+              type="text" 
+              id="discussion-tags" 
+              class="form-input" 
+              placeholder="e.g., algebra, equations, homework"
+            >
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" id="cancel-modal">Cancel</button>
+        <button type="submit" form="new-discussion-form" class="btn btn-primary">
+          <i class="fas fa-paper-plane"></i>
+          Post Discussion
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/utils.js"></script>
+  <script src="../js/components.js"></script>
+  <script>
+    // Initialize layout
+    initializeAppLayout('discussions');
+
+    // State
+    let discussions = [];
+    let currentSubject = 'all';
+    let currentClass = '';
+
+    // Initialize
+    async function init() {
+      try {
+        // Load user configuration
+        const config = await API.get('/config');
+        const user = Auth.getUser();
+
+        // Populate subject tabs
+        populateSubjectTabs(config.subjects);
+
+        // Populate subject select in modal
+        populateSubjectSelect(config.subjects);
+
+        // Populate class filter
+        populateClassFilter(user.class);
+
+        // Load discussions
+        await loadDiscussions();
+
+      } catch (error) {
+        console.error('Error initializing:', error);
+        UI.showAlert('Failed to load discussions', 'error');
+      }
+    }
+
+    // Populate subject tabs
+    function populateSubjectTabs(subjects) {
+      const container = document.getElementById('subject-tabs');
+      
+      subjects.forEach(subject => {
+        const tab = document.createElement('div');
+        tab.className = 'tab';
+        tab.textContent = subject.charAt(0).toUpperCase() + subject.slice(1);
+        tab.dataset.subject = subject;
+        tab.addEventListener('click', () => selectSubject(subject));
+        container.appendChild(tab);
+      });
+    }
+
+    // Select subject
+    function selectSubject(subject) {
+      currentSubject = subject;
+      
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.subject === subject) {
+          tab.classList.add('active');
+        }
+      });
+
+      loadDiscussions();
+    }
+
+    // Populate subject select
+    function populateSubjectSelect(subjects) {
+      const select = document.getElementById('discussion-subject');
+      subjects.forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject.charAt(0).toUpperCase() + subject.slice(1);
+        select.appendChild(option);
+      });
+    }
+
+    // Populate class filter
+    function populateClassFilter(userClass) {
+      const select = document.getElementById('class-filter');
+      for (let i = 1; i <= 12; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = `Class ${i}`;
+        if (i === userClass) option.selected = true;
+        select.appendChild(option);
+      }
+
+      select.addEventListener('change', (e) => {
+        currentClass = e.target.value;
+        loadDiscussions();
+      });
+    }
+
+    // Load discussions
+    async function loadDiscussions() {
+      try {
+        const params = new URLSearchParams();
+        if (currentSubject !== 'all') params.append('subject', currentSubject);
+        if (currentClass) params.append('class', currentClass);
+
+        const data = await API.get(`/discussions?${params.toString()}`);
+        discussions = data;
+        renderDiscussions();
+
+      } catch (error) {
+        console.error('Error loading discussions:', error);
+        document.getElementById('discussion-list').innerHTML = 
+          '<p class="text-secondary text-center">Failed to load discussions</p>';
+      }
+    }
+
+    // Render discussions
+    function renderDiscussions() {
+      const container = document.getElementById('discussion-list');
+      
+      if (discussions.length === 0) {
+        container.innerHTML = '<p class="text-secondary text-center">No discussions found</p>';
+        return;
+      }
+
+      container.innerHTML = discussions.map(discussion => `
+        <div class="discussion-item" onclick="viewDiscussion('${discussion._id}')">
+          <div class="discussion-header">
+            <div class="discussion-avatar">${UI.getUserInitials(discussion.author.name)}</div>
+            <div class="discussion-content">
+              <div class="discussion-title">${discussion.title}</div>
+              <div class="discussion-meta">
+                <span><i class="fas fa-user"></i> ${discussion.author.name}</span>
+                <span><i class="fas fa-clock"></i> ${UI.formatRelativeTime(discussion.createdAt)}</span>
+                <span class="badge badge-primary">${discussion.subject}</span>
+              </div>
+            </div>
+          </div>
+          <div class="discussion-preview">${UI.truncate(discussion.content, 150)}</div>
+          <div class="discussion-footer">
+            <div class="discussion-tags">
+              ${(discussion.tags || []).map(tag => 
+                `<span class="badge badge-info">${tag}</span>`
+              ).join('')}
+            </div>
+            <div class="discussion-stats">
+              <div class="stat-item">
+                <i class="fas fa-comment"></i>
+                <span>${discussion.replyCount || 0}</span>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-thumbs-up"></i>
+                <span>${discussion.likes || 0}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // View discussion
+    function viewDiscussion(id) {
+      window.location.href = `discussion-thread.html?id=${id}`;
+    }
+
+    // Search
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const filtered = discussions.filter(d => 
+        d.title.toLowerCase().includes(query) ||
+        d.content.toLowerCase().includes(query)
+      );
+      
+      const container = document.getElementById('discussion-list');
+      if (filtered.length === 0) {
+        container.innerHTML = '<p class="text-secondary text-center">No matching discussions</p>';
+      } else {
+        discussions = filtered;
+        renderDiscussions();
+      }
+    });
+
+    // New discussion modal
+    document.getElementById('new-discussion-btn').addEventListener('click', () => {
+      document.getElementById('new-discussion-modal').classList.add('show');
+    });
+
+    document.getElementById('close-modal').addEventListener('click', () => {
+      document.getElementById('new-discussion-modal').classList.remove('show');
+    });
+
+    document.getElementById('cancel-modal').addEventListener('click', () => {
+      document.getElementById('new-discussion-modal').classList.remove('show');
+    });
+
+    // Submit new discussion
+    document.getElementById('new-discussion-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        subject: document.getElementById('discussion-subject').value,
+        chapter: document.getElementById('discussion-chapter').value,
+        title: document.getElementById('discussion-title').value,
+        content: document.getElementById('discussion-content').value,
+        tags: document.getElementById('discussion-tags').value
+          .split(',')
+          .map(t => t.trim())
+          .filter(t => t)
+      };
+
+      try {
+        UI.showLoading();
+        await API.post('/discussions', formData);
+        
+        UI.hideLoading();
+        UI.showAlert('Discussion posted successfully!', 'success');
+        
+        document.getElementById('new-discussion-modal').classList.remove('show');
+        document.getElementById('new-discussion-form').reset();
+        
+        await loadDiscussions();
+      } catch (error) {
+        UI.hideLoading();
+        UI.showAlert(error.message || 'Failed to post discussion', 'error');
+      }
+    });
+
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>

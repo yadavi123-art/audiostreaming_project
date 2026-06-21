@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: audiostreaming-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: changeme
+      MONGO_INITDB_DATABASE: audiostreaming
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - audiostreaming-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Application Server
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: audiostreaming-app
+    restart: unless-stopped
+    ports:
+      - "8004:8004"
+    environment:
+      NODE_ENV: production
+      PORT: 8004
+      MONGODB_URI: mongodb://admin:changeme@mongodb:27017/audiostreaming?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRE: 7d
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:8004}
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - audiostreaming-network
+    volumes:
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8004/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Redis for session storage (uncomment if needed)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: audiostreaming-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - audiostreaming-network
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+  # Optional: Nginx reverse proxy (uncomment for production)
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: audiostreaming-nginx
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./ssl:/etc/nginx/ssl:ro
+  #   depends_on:
+  #     - app
+  #   networks:
+  #     - audiostreaming-network
+
+networks:
+  audiostreaming-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+  # redis_data:
+  #   driver: local

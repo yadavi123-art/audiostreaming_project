@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Progress - AI Learning Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .progress-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .progress-card {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: var(--spacing-xl);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .progress-card-icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--spacing-md);
+      opacity: 0.9;
+    }
+
+    .progress-card-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .progress-card-label {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .subject-progress {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .subject-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .subject-name {
+      font-weight: 600;
+      font-size: 1.125rem;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .subject-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .progress-bar-wrapper {
+      background-color: var(--surface-variant);
+      height: 12px;
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      border-radius: var(--radius-full);
+      transition: width var(--transition-base);
+    }
+
+    .chapter-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .chapter-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md);
+      background-color: var(--surface-variant);
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+    }
+
+    .chapter-item:hover {
+      background-color: var(--border-color);
+    }
+
+    .chapter-info {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .chapter-status {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .chapter-status.completed {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .chapter-status.in-progress {
+      background-color: var(--warning);
+      color: white;
+    }
+
+    .chapter-status.not-started {
+      background-color: var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    .quiz-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .quiz-table th {
+      text-align: left;
+      padding: var(--spacing-md);
+      background-color: var(--surface-variant);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .quiz-table td {
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .quiz-table tr:hover {
+      background-color: var(--surface-variant);
+    }
+
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-xs) var(--spacing-md);
+      border-radius: var(--radius-full);
+      font-weight: 600;
+      min-width: 60px;
+    }
+
+    .score-badge.excellent {
+      background-color: rgba(76, 175, 80, 0.1);
+      color: var(--success);
+    }
+
+    .score-badge.good {
+      background-color: rgba(33, 150, 243, 0.1);
+      color: var(--info);
+    }
+
+    .score-badge.average {
+      background-color: rgba(255, 152, 0, 0.1);
+      color: var(--warning);
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-top: var(--spacing-lg);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="main-content">
+      <div class="content">
+        <div class="page-header">
+          <h1 class="page-title">My Progress</h1>
+          <p class="page-subtitle">Track your learning journey</p>
+        </div>
+
+        <!-- Progress Overview -->
+        <div class="progress-overview">
+          <div class="progress-card">
+            <div class="progress-card-icon">
+              <i class="fas fa-book-open"></i>
+            </div>
+            <div class="progress-card-value" id="total-chapters">0</div>
+            <div class="progress-card-label">Chapters Completed</div>
+          </div>
+
+          <div class="progress-card">
+            <div class="progress-card-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="progress-card-value" id="total-quizzes">0</div>
+            <div class="progress-card-label">Quizzes Passed</div>
+          </div>
+
+          <div class="progress-card">
+            <div class="progress-card-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="progress-card-value" id="total-time">0h</div>
+            <div class="progress-card-label">Total Time Spent</div>
+          </div>
+
+          <div class="progress-card">
+            <div class="progress-card-icon">
+              <i class="fas fa-fire"></i>
+            </div>
+            <div class="progress-card-value" id="current-streak">0</div>
+            <div class="progress-card-label">Day Streak</div>
+          </div>
+        </div>
+
+        <!-- Subject-wise Progress -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Subject Progress</h3>
+          </div>
+          <div class="card-body" id="subject-progress">
+            <p class="text-secondary">Loading progress...</p>
+          </div>
+        </div>
+
+        <!-- Chapter Completion -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Chapter Completion</h3>
+            <select id="subject-filter" class="form-select" style="width: auto;">
+              <option value="">All Subjects</option>
+            </select>
+          </div>
+          <div class="card-body">
+            <div class="chapter-list" id="chapter-list">
+              <p class="text-secondary">Loading chapters...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz Scores -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Quiz Scores</h3>
+          </div>
+          <div class="card-body">
+            <table class="quiz-table" id="quiz-table">
+              <thead>
+                <tr>
+                  <th>Subject</th>
+                  <th>Chapter</th>
+                  <th>Date</th>
+                  <th>Score</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="5" class="text-center text-secondary">Loading quiz scores...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Time Spent Chart -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Time Spent (Last 7 Days)</h3>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="time-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/utils.js"></script>
+  <script src="../js/components.js"></script>
+  <script>
+    // Initialize layout
+    initializeAppLayout('progress');
+
+    // Initialize
+    async function init() {
+      try {
+        // Load progress data
+        const progressData = await API.get('/progress/summary');
+        
+        // Update overview cards
+        document.getElementById('total-chapters').textContent = progressData.chaptersCompleted || 0;
+        document.getElementById('total-quizzes').textContent = progressData.quizzesPassed || 0;
+        
+        const hours = Math.floor((progressData.totalTimeSpent || 0) / 60);
+        document.getElementById('total-time').textContent = `${hours}h`;
+        document.getElementById('current-streak').textContent = progressData.currentStreak || 0;
+
+        // Load subject progress
+        await loadSubjectProgress();
+
+        // Load chapters
+        await loadChapters();
+
+        // Load quiz scores
+        await loadQuizScores();
+
+        // Load time chart
+        await loadTimeChart();
+
+      } catch (error) {
+        console.error('Error initializing:', error);
+        UI.showAlert('Failed to load progress data', 'error');
+      }
+    }
+
+    // Load subject progress
+    async function loadSubjectProgress() {
+      try {
+        const data = await API.get('/progress/by-subject');
+        const container = document.getElementById('subject-progress');
+        
+        if (data.length === 0) {
+          container.innerHTML = '<p class="text-secondary">No progress data available</p>';
+          return;
+        }
+
+        container.innerHTML = data.map(subject => `
+          <div class="subject-progress">
+            <div class="subject-header">
+              <div class="subject-name">
+                <div class="subject-icon">
+                  <i class="fas fa-book"></i>
+                </div>
+                ${subject.subject}
+              </div>
+              <span class="badge badge-primary">${subject.progress}%</span>
+            </div>
+            <div class="progress-bar-wrapper">
+              <div class="progress-bar-fill" style="width: ${subject.progress}%"></div>
+            </div>
+          </div>
+        `).join('');
+
+        // Populate subject filter
+        const select = document.getElementById('subject-filter');
+        data.forEach(subject => {
+          const option = document.createElement('option');
+          option.value = subject.subject;
+          option.textContent = subject.subject;
+          select.appendChild(option);
+        });
+
+      } catch (error) {
+        console.error('Error loading subject progress:', error);
+      }
+    }
+
+    // Load chapters
+    async function loadChapters() {
+      try {
+        const data = await API.get('/progress/chapters');
+        renderChapters(data);
+
+        // Filter handler
+        document.getElementById('subject-filter').addEventListener('change', (e) => {
+          const subject = e.target.value;
+          const filtered = subject ? data.filter(c => c.subject === subject) : data;
+          renderChapters(filtered);
+        });
+
+      } catch (error) {
+        console.error('Error loading chapters:', error);
+      }
+    }
+
+    // Render chapters
+    function renderChapters(chapters) {
+      const container = document.getElementById('chapter-list');
+      
+      if (chapters.length === 0) {
+        container.innerHTML = '<p class="text-secondary">No chapters found</p>';
+        return;
+      }
+
+      container.innerHTML = chapters.map(chapter => {
+        const statusClass = chapter.completed ? 'completed' : 
+                           chapter.inProgress ? 'in-progress' : 'not-started';
+        const statusIcon = chapter.completed ? 'fa-check' : 
+                          chapter.inProgress ? 'fa-spinner' : 'fa-circle';
+        
+        return `
+          <div class="chapter-item">
+            <div class="chapter-info">
+              <div class="chapter-status ${statusClass}">
+                <i class="fas ${statusIcon}"></i>
+              </div>
+              <div>
+                <div class="font-medium">${chapter.name}</div>
+                <div class="text-sm text-secondary">${chapter.subject}</div>
+              </div>
+            </div>
+            <div class="text-sm text-secondary">
+              ${chapter.completed ? UI.formatDate(chapter.completedAt) : 
+                chapter.inProgress ? 'In Progress' : 'Not Started'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Load quiz scores
+    async function loadQuizScores() {
+      try {
+        const data = await API.get('/progress/quizzes');
+        const tbody = document.querySelector('#quiz-table tbody');
+        
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-secondary">No quiz scores available</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = data.map(quiz => {
+          const scoreClass = quiz.score >= 80 ? 'excellent' : 
+                            quiz.score >= 60 ? 'good' : 'average';
+          const status = quiz.passed ? 'Passed' : 'Failed';
+          
+          return `
+            <tr>
+              <td>${quiz.subject}</td>
+              <td>${quiz.chapter}</td>
+              <td>${UI.formatDate(quiz.date)}</td>
+              <td><span class="score-badge ${scoreClass}">${quiz.score}%</span></td>
+              <td><span class="badge badge-${quiz.passed ? 'success' : 'error'}">${status}</span></td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Error loading quiz scores:', error);
+      }
+    }
+
+    // Load time chart
+    async function loadTimeChart() {
+      try {
+        const data = await API.get('/progress/time-spent');
+        
+        const ctx = document.getElementById('time-chart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.map(d => UI.formatDate(d.date)),
+            datasets: [{
+              label: 'Minutes',
+              data: data.map(d => d.minutes),
+              backgroundColor: 'rgba(98, 0, 238, 0.5)',
+              borderColor: 'rgba(98, 0, 238, 1)',
+              borderWidth: 2,
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return value + ' min';
+                  }
+                }
+              }
+            }
+          }
+        });
+
+      } catch (error) {
+        console.error('Error loading time chart:', error);
+      }
+    }
+
+    // Initialize on load
+    init();
+  </script>
+</body>
+</html>
